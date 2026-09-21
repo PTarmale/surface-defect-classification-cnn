@@ -1,4 +1,5 @@
-from tensorflow.keras import layers, models
+from tensorflow.keras import layers, models, regularizers
+from tensorflow.keras.optimizers import Adam
 
 IMG_SIZE = 128
 NUM_CLASSES = 6
@@ -13,7 +14,8 @@ def create_improved_model():
             32,
             (3, 3),
             activation="relu",
-            input_shape=(IMG_SIZE, IMG_SIZE, 1)
+            input_shape=(IMG_SIZE, IMG_SIZE, 1),
+            kernel_regularizer=regularizers.l2(0.0001)
         ),
         layers.BatchNormalization(),
         layers.MaxPooling2D((2, 2)),
@@ -22,7 +24,8 @@ def create_improved_model():
         layers.Conv2D(
             64,
             (3, 3),
-            activation="relu"
+            activation="relu",
+            kernel_regularizer=regularizers.l2(0.0001)
         ),
         layers.BatchNormalization(),
         layers.MaxPooling2D((2, 2)),
@@ -31,26 +34,19 @@ def create_improved_model():
         layers.Conv2D(
             128,
             (3, 3),
-            activation="relu"
-        ),
-        layers.BatchNormalization(),
-        layers.MaxPooling2D((2, 2)),
-
-        # Block 4
-        layers.Conv2D(
-            256,
-            (3, 3),
-            activation="relu"
+            activation="relu",
+            kernel_regularizer=regularizers.l2(0.0001)
         ),
         layers.BatchNormalization(),
         layers.MaxPooling2D((2, 2)),
 
         # Classification
-        layers.GlobalAveragePooling2D(),
+        layers.Flatten(),
 
         layers.Dense(
             128,
-            activation="relu"
+            activation="relu",
+            kernel_regularizer=regularizers.l2(0.0001)
         ),
 
         layers.Dropout(0.5),
@@ -62,7 +58,7 @@ def create_improved_model():
     ])
 
     model.compile(
-        optimizer="adam",
+        optimizer=Adam(learning_rate=0.0005),
         loss="categorical_crossentropy",
         metrics=["accuracy"]
     )
