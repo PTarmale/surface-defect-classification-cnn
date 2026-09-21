@@ -1,8 +1,12 @@
-# Surface Defect Classification Using CNN
+# Surface Defect Classification Using Convolutional Neural Networks
 
 A deep learning project for automatic classification of steel surface defects using Convolutional Neural Networks (CNNs).
 
-The project compares a **Baseline CNN** with an **Improved CNN architecture** to study the effect of architectural improvements on surface defect classification.
+This project experimentally compares a **Baseline CNN** with a **Final Modified CNN** on the NEU Surface Defect Database (NEU-DET).
+
+The purpose of the study is to investigate how architectural modifications such as Batch Normalization and L2 regularization affect surface defect classification performance.
+
+---
 
 ## 📌 Project Overview
 
@@ -10,16 +14,21 @@ Surface defects in industrial materials can affect product quality and manufactu
 
 This project uses computer vision and deep learning to automatically classify steel surface images into six defect categories.
 
-The implementation is based on the **NEU Surface Defect Database (NEU-DET)** and is developed independently as a research-oriented implementation.
+The implementation is based on the **NEU Surface Defect Database (NEU-DET)** and was developed independently as an experimental research implementation.
+
+---
 
 ## 🎯 Objectives
 
-* Develop a CNN-based surface defect classification system.
-* Classify steel surface images into six defect categories.
-* Establish a baseline CNN model.
-* Develop an improved CNN architecture.
-* Compare the performance of both models using standard evaluation metrics.
-* Analyze classification performance using confusion matrices and classification reports.
+- Develop a CNN-based surface defect classification system.
+- Classify steel surface images into six defect categories.
+- Establish a baseline CNN model.
+- Develop a modified CNN architecture.
+- Compare both models using standard evaluation metrics.
+- Analyze classification performance using classification reports and confusion matrices.
+- Study the effect of architectural and regularization changes on model performance.
+
+---
 
 ## 🗂️ Dataset
 
@@ -36,89 +45,137 @@ The dataset contains six types of steel surface defects:
 
 ### Dataset Distribution
 
-| Dataset    | Images |
-| ---------- | -----: |
-| Training   |  1,440 |
-| Validation |    360 |
-| Total      |  1,800 |
+| Dataset | Images |
+|---|---:|
+| Training | 1,440 |
+| Validation | 360 |
+| Total | 1,800 |
 
-The images are processed as grayscale images and resized to **128 × 128 pixels** for model training.
+The images are processed as grayscale images and resized to **128 × 128 pixels**.
+
+---
 
 ## 🔄 Data Preprocessing
 
 The preprocessing pipeline includes:
 
-* Image resizing to 128 × 128 pixels
-* Conversion to grayscale
-* Pixel normalization to the range 0–1
-* Data augmentation for training images
+- Image resizing to 128 × 128 pixels
+- Grayscale image processing
+- Pixel normalization to the range 0–1
+- Data augmentation for training images
 
 Training augmentation includes:
 
-* Rotation
-* Width shifting
-* Height shifting
-* Zooming
-* Horizontal flipping
+- Rotation
+- Width shifting
+- Height shifting
+- Zooming
+- Horizontal flipping
 
 Validation images are normalized without augmentation.
+
+---
 
 ## 🧠 Baseline CNN
 
 The baseline model consists of:
 
-* Convolutional layer — 32 filters
-* Max Pooling
-* Convolutional layer — 64 filters
-* Max Pooling
-* Convolutional layer — 128 filters
-* Max Pooling
-* Flatten layer
-* Dense layer — 128 neurons
-* Dropout — 0.5
-* Softmax output layer — 6 classes
+- Convolutional layer — 32 filters
+- Max Pooling
+- Convolutional layer — 64 filters
+- Max Pooling
+- Convolutional layer — 128 filters
+- Max Pooling
+- Flatten layer
+- Dense layer — 128 neurons
+- Dropout — 0.5
+- Softmax output layer — 6 classes
 
-The model is trained using the Adam optimizer and categorical cross-entropy loss.
+The model uses:
 
-## 🚀 Improved CNN
+- Adam optimizer
+- Categorical cross-entropy loss
 
-An improved CNN architecture was developed to investigate whether additional architectural components could improve classification performance.
+---
 
-The improved model includes:
+## 🚀 Final Modified CNN
 
-* Four convolutional blocks
-* Batch Normalization
-* Max Pooling
-* Increasing feature channels: 32 → 64 → 128 → 256
-* Global Average Pooling
-* Dense layer with 128 neurons
-* Dropout — 0.5
-* Six-class Softmax output
+A modified CNN architecture was developed to investigate the effect of additional regularization and normalization techniques.
 
-### Main architectural improvements
+The final model includes:
 
-| Component              | Baseline CNN | Improved CNN |
-| ---------------------- | ------------ | ------------ |
-| Convolutional blocks   | 3            | 4            |
-| Batch Normalization    | No           | Yes          |
-| Global Average Pooling | No           | Yes          |
-| Dropout                | Yes          | Yes          |
-| Output classes         | 6            | 6            |
+- Three convolutional blocks
+- Feature channels: 32 → 64 → 128
+- Batch Normalization after each convolutional layer
+- Max Pooling
+- L2 kernel regularization
+- Flatten layer
+- Dense layer with 128 neurons
+- Dropout — 0.5
+- Six-class Softmax output
+- Adam optimizer with learning rate 0.0005
 
-## 📊 Evaluation
+### Architecture Comparison
+
+| Component | Baseline CNN | Final Modified CNN |
+|---|---|---|
+| Convolutional blocks | 3 | 3 |
+| Feature channels | 32 → 64 → 128 | 32 → 64 → 128 |
+| Batch Normalization | No | Yes |
+| L2 Regularization | No | Yes |
+| Flatten | Yes | Yes |
+| Dense layer | 128 | 128 |
+| Dropout | 0.5 | 0.5 |
+| Output classes | 6 | 6 |
+
+---
+
+## 📊 Evaluation Metrics
 
 The models are evaluated using:
 
-* Accuracy
-* Precision
-* Recall
-* F1-Score
-* Confusion Matrix
-* Classification Report
+- Accuracy
+- Precision
+- Recall
+- F1-Score
+- Confusion Matrix
+- Classification Report
 
-The evaluation pipeline generates a comparison between the Baseline CNN and Improved CNN.
+The evaluation pipeline compares the Baseline CNN with the Final Modified CNN.
 
-Experimental results are available in the `results/` directory.
+---
+
+## 📈 Experimental Results
+
+The experimental results obtained on the 360-image validation set are:
+
+| Metric | Baseline CNN | Final Modified CNN |
+|---|---:|---:|
+| Accuracy | 78.89% | 68.33% |
+| Precision | 81.79% | 77.38% |
+| Recall | 78.89% | 68.33% |
+| F1-Score | 78.98% | 66.50% |
+
+The results show that the final modified architecture did not outperform the baseline CNN on this experimental setup.
+
+This observation is useful for analyzing the effect of architectural modifications rather than assuming that additional layers or regularization techniques will always improve classification performance.
+
+---
+
+## 📋 Final Modified CNN Classification Results
+
+| Defect Class | Precision | Recall | F1-Score |
+|---|---:|---:|---:|
+| Crazing | 0.70 | 1.00 | 0.82 |
+| Inclusion | 0.80 | 0.67 | 0.73 |
+| Patches | 1.00 | 0.58 | 0.74 |
+| Pitted Surface | 0.64 | 0.58 | 0.61 |
+| Rolled-in Scale | 0.51 | 1.00 | 0.67 |
+| Scratches | 1.00 | 0.27 | 0.42 |
+
+Overall validation accuracy: **68.33%**
+
+---
 
 ## 📁 Project Structure
 
@@ -130,6 +187,12 @@ surface-defect-classification-cnn/
 ├── requirements.txt
 ├── .gitignore
 │
+├── final_accuracy.png
+├── final_loss.png
+├── final_confusion_matrix.png
+├── final_classification_report.txt
+├── final_model_comparison.csv
+│
 ├── src/
 │   ├── preprocessing.py
 │   ├── baseline_model.py
@@ -139,118 +202,3 @@ surface-defect-classification-cnn/
 │   └── predict.py
 │
 └── results/
-    ├── baseline_accuracy.png
-    ├── baseline_loss.png
-    ├── classification_report.txt
-    ├── improved_classification_report.txt
-    ├── improved_confusion_matrix.png
-    └── model_comparison.csv
-```
-
-## ⚙️ Technologies Used
-
-* Python
-* TensorFlow / Keras
-* NumPy
-* Pandas
-* Scikit-learn
-* Matplotlib
-* Seaborn
-* Pillow
-* Google Colab
-* GitHub
-
-## ▶️ How to Run
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/PTarmale/surface-defect-classification-cnn.git
-cd surface-defect-classification-cnn
-```
-
-### 2. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 3. Prepare the dataset
-
-Download the NEU-DET dataset and place it in:
-
-```text
-dataset/
-└── NEU-DET/
-    ├── train/
-    │   └── images/
-    └── validation/
-        └── images/
-```
-
-The dataset itself is excluded from this repository through `.gitignore`.
-
-### 4. Train the models
-
-```bash
-python src/train.py
-```
-
-This trains both the baseline and improved CNN models.
-
-### 5. Evaluate the models
-
-```bash
-python src/evaluate.py
-```
-
-The evaluation script generates classification metrics and saves the model comparison results.
-
-### 6. Predict a single image
-
-Update the image path in `src/predict.py` and run:
-
-```bash
-python src/predict.py
-```
-
-## 🔬 Research Contribution
-
-The project provides an independent experimental comparison between a basic CNN architecture and an improved CNN architecture incorporating:
-
-* Batch Normalization
-* An additional convolutional block
-* Global Average Pooling
-* Regularization through Dropout
-
-The objective is to investigate how these architectural changes affect surface defect classification performance on the NEU-DET dataset.
-
-## 📈 Results
-
-The repository contains the generated experimental outputs, including:
-
-* Training accuracy graph
-* Training loss graph
-* Classification reports
-* Improved model confusion matrix
-* Baseline vs Improved model comparison
-
-Numerical performance values are intentionally reported directly from the generated experiment files rather than being manually entered here.
-
-## 📚 Reference
-
-Arikan, S., Varanasi, K., & Stricker, D. (2019). *Surface Defect Classification in Real-Time Using Convolutional Neural Networks*. arXiv:1904.04671.
-
-Official paper:
-
-https://arxiv.org/abs/1904.04671
-
-## 👩‍💻 Author
-
-**Prachi Tarmale**
-
-AI & Data Science Student
-
-## ⭐ Project Status
-
-Research-oriented implementation and experimental comparison completed. Further work can explore transfer learning, lightweight architectures, additional augmentation strategies, and deployment for real-time industrial inspection.
