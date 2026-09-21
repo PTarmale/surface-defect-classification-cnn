@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 
+from tensorflow.keras.models import load_model
+
 from sklearn.metrics import (
     accuracy_score,
     precision_score,
@@ -11,8 +13,6 @@ from sklearn.metrics import (
 )
 
 from preprocessing import create_data_generators
-from baseline_model import create_baseline_model
-from improved_model import create_improved_model
 
 
 def evaluate_model(model, validation_data):
@@ -43,25 +43,29 @@ def evaluate_model(model, validation_data):
     precision = precision_score(
         true_classes,
         predicted_classes,
-        average="weighted"
+        average="weighted",
+        zero_division=0
     )
 
     recall = recall_score(
         true_classes,
         predicted_classes,
-        average="weighted"
+        average="weighted",
+        zero_division=0
     )
 
     f1 = f1_score(
         true_classes,
         predicted_classes,
-        average="weighted"
+        average="weighted",
+        zero_division=0
     )
 
     report = classification_report(
         true_classes,
         predicted_classes,
-        target_names=class_names
+        target_names=class_names,
+        zero_division=0
     )
 
     cm = confusion_matrix(
@@ -69,18 +73,28 @@ def evaluate_model(model, validation_data):
         predicted_classes
     )
 
-    return accuracy, precision, recall, f1, report, cm
+    return (
+        accuracy,
+        precision,
+        recall,
+        f1,
+        report,
+        cm
+    )
 
 
 if __name__ == "__main__":
 
+    # Load validation data
     train_data, validation_data = create_data_generators()
+
+    # -----------------------------
+    # Evaluate Baseline CNN
+    # -----------------------------
 
     print("\nEvaluating Baseline CNN...")
 
-    baseline_model = create_baseline_model()
-
-    baseline_model.load_weights(
+    baseline_model = load_model(
         "baseline_surface_defect_cnn.keras"
     )
 
@@ -89,14 +103,16 @@ if __name__ == "__main__":
         validation_data
     )
 
-    print("\nBaseline Classification Report:")
+    print("\nBaseline CNN Classification Report:")
     print(baseline_results[4])
+
+    # -----------------------------
+    # Evaluate Improved CNN
+    # -----------------------------
 
     print("\nEvaluating Improved CNN...")
 
-    improved_model = create_improved_model()
-
-    improved_model.load_weights(
+    improved_model = load_model(
         "improved_surface_defect_cnn.keras"
     )
 
@@ -105,22 +121,29 @@ if __name__ == "__main__":
         validation_data
     )
 
-    print("\nImproved Classification Report:")
+    print("\nImproved CNN Classification Report:")
     print(improved_results[4])
 
+    # -----------------------------
+    # Model Comparison
+    # -----------------------------
+
     comparison = pd.DataFrame({
+
         "Metric": [
             "Accuracy",
             "Precision",
             "Recall",
             "F1-Score"
         ],
+
         "Baseline CNN": [
             baseline_results[0],
             baseline_results[1],
             baseline_results[2],
             baseline_results[3]
         ],
+
         "Improved CNN": [
             improved_results[0],
             improved_results[1],
@@ -132,9 +155,24 @@ if __name__ == "__main__":
     print("\nModel Comparison:")
     print(comparison)
 
+    # Save comparison
     comparison.to_csv(
         "model_comparison.csv",
         index=False
     )
 
+    # Save reports
+    with open(
+        "baseline_classification_report.txt",
+        "w"
+    ) as file:
+        file.write(baseline_results[4])
+
+    with open(
+        "improved_classification_report.txt",
+        "w"
+    ) as file:
+        file.write(improved_results[4])
+
     print("\nEvaluation completed successfully!")
+    print("Results saved successfully!")
