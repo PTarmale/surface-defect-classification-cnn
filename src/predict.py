@@ -1,7 +1,6 @@
 import numpy as np
 
 from PIL import Image
-
 from tensorflow.keras.models import load_model
 
 from preprocessing import IMG_SIZE
@@ -77,11 +76,11 @@ if __name__ == "__main__":
         "scratches"
     ]
 
+    # Replace this with the path of your test image
     image_path = "sample_image.jpg"
 
-    model_path = (
-        "baseline_surface_defect_cnn.keras"
-    )
+    # Use the final trained model
+    model_path = "final_surface_defect_cnn.keras"
 
     predict_image(
         image_path,
