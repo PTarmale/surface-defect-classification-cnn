@@ -23,7 +23,7 @@ def train_baseline():
     return model, history
 
 
-def train_improved():
+def train_final_model():
 
     train_data, validation_data = create_data_generators()
 
@@ -35,7 +35,7 @@ def train_improved():
         epochs=EPOCHS
     )
 
-    model.save("improved_surface_defect_cnn.keras")
+    model.save("final_surface_defect_cnn.keras")
 
     return model, history
 
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     print("Training baseline CNN...")
     baseline_model, baseline_history = train_baseline()
 
-    print("Training improved CNN...")
-    improved_model, improved_history = train_improved()
+    print("Training final modified CNN...")
+    final_model, final_history = train_final_model()
 
     print("Training completed successfully!")
