@@ -107,22 +107,22 @@ if __name__ == "__main__":
     print(baseline_results[4])
 
     # -----------------------------
-    # Evaluate Improved CNN
+    # Evaluate Final Modified CNN
     # -----------------------------
 
-    print("\nEvaluating Improved CNN...")
+    print("\nEvaluating Final Modified CNN...")
 
-    improved_model = load_model(
-        "improved_surface_defect_cnn.keras"
+    final_model = load_model(
+        "final_surface_defect_cnn.keras"
     )
 
-    improved_results = evaluate_model(
-        improved_model,
+    final_results = evaluate_model(
+        final_model,
         validation_data
     )
 
-    print("\nImproved CNN Classification Report:")
-    print(improved_results[4])
+    print("\nFinal Modified CNN Classification Report:")
+    print(final_results[4])
 
     # -----------------------------
     # Model Comparison
@@ -144,11 +144,11 @@ if __name__ == "__main__":
             baseline_results[3]
         ],
 
-        "Improved CNN": [
-            improved_results[0],
-            improved_results[1],
-            improved_results[2],
-            improved_results[3]
+        "Final Modified CNN": [
+            final_results[0],
+            final_results[1],
+            final_results[2],
+            final_results[3]
         ]
     })
 
@@ -157,7 +157,7 @@ if __name__ == "__main__":
 
     # Save comparison
     comparison.to_csv(
-        "model_comparison.csv",
+        "final_model_comparison.csv",
         index=False
     )
 
@@ -169,10 +169,25 @@ if __name__ == "__main__":
         file.write(baseline_results[4])
 
     with open(
-        "improved_classification_report.txt",
+        "final_classification_report.txt",
         "w"
     ) as file:
-        file.write(improved_results[4])
+        file.write(final_results[4])
+
+    # Save confusion matrices
+    np.savetxt(
+        "baseline_confusion_matrix.csv",
+        baseline_results[5],
+        delimiter=",",
+        fmt="%d"
+    )
+
+    np.savetxt(
+        "final_confusion_matrix.csv",
+        final_results[5],
+        delimiter=",",
+        fmt="%d"
+    )
 
     print("\nEvaluation completed successfully!")
     print("Results saved successfully!")
