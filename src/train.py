@@ -1,9 +1,11 @@
+import tensorflow as tf
+
 from preprocessing import create_data_generators
 from baseline_model import create_baseline_model
 from improved_model import create_improved_model
 
 
-EPOCHS = 15
+EPOCHS = 30
 
 
 def train_baseline():
@@ -23,19 +25,27 @@ def train_baseline():
     return model, history
 
 
-def train_final_model():
+def train_improved():
 
     train_data, validation_data = create_data_generators()
 
     model = create_improved_model()
 
+    # Paper-style learning-rate schedule:
+    # decrease learning rate by 0.8 every 3 epochs
+    lr_scheduler = tf.keras.callbacks.LearningRateScheduler(
+        lambda epoch, lr:
+        lr * 0.8 if epoch > 0 and epoch % 3 == 0 else lr
+    )
+
     history = model.fit(
         train_data,
         validation_data=validation_data,
-        epochs=EPOCHS
+        epochs=EPOCHS,
+        callbacks=[lr_scheduler]
     )
 
-    model.save("final_surface_defect_cnn.keras")
+    model.save("improved_surface_defect_cnn.keras")
 
     return model, history
 
@@ -43,9 +53,11 @@ def train_final_model():
 if __name__ == "__main__":
 
     print("Training baseline CNN...")
+
     baseline_model, baseline_history = train_baseline()
 
-    print("Training final modified CNN...")
-    final_model, final_history = train_final_model()
+    print("Training SurfNet-based CNN...")
+
+    improved_model, improved_history = train_improved()
 
     print("Training completed successfully!")
