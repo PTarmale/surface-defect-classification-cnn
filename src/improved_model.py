@@ -1,64 +1,157 @@
+import tensorflow as tf
 from tensorflow.keras import layers, models, regularizers
-from tensorflow.keras.optimizers import Adam
 
 IMG_SIZE = 128
 NUM_CLASSES = 6
 
 
+def conv_block(filters, kernel_size, stride=2):
+    return [
+        layers.Conv2D(
+            filters,
+            kernel_size,
+            strides=stride,
+            padding="same",
+            use_bias=False,
+            kernel_regularizer=regularizers.l2(0.1)
+        ),
+        layers.BatchNormalization(),
+        layers.PReLU()
+    ]
+
+
 def create_improved_model():
 
-    model = models.Sequential([
+    inputs = layers.Input(shape=(IMG_SIZE, IMG_SIZE, 1))
 
-        # Block 1
-        layers.Conv2D(
-            32,
-            (3, 3),
-            activation="relu",
-            input_shape=(IMG_SIZE, IMG_SIZE, 1),
-            kernel_regularizer=regularizers.l2(0.0001)
-        ),
-        layers.BatchNormalization(),
-        layers.MaxPooling2D((2, 2)),
+    # First convolution
+    x = layers.Conv2D(
+        32,
+        (5, 5),
+        strides=2,
+        padding="same",
+        use_bias=False,
+        kernel_regularizer=regularizers.l2(0.1)
+    )(inputs)
 
-        # Block 2
-        layers.Conv2D(
-            64,
-            (3, 3),
-            activation="relu",
-            kernel_regularizer=regularizers.l2(0.0001)
-        ),
-        layers.BatchNormalization(),
-        layers.MaxPooling2D((2, 2)),
+    x = layers.BatchNormalization()(x)
+    x = layers.PReLU()(x)
 
-        # Block 3
-        layers.Conv2D(
-            128,
-            (3, 3),
-            activation="relu",
-            kernel_regularizer=regularizers.l2(0.0001)
-        ),
-        layers.BatchNormalization(),
-        layers.MaxPooling2D((2, 2)),
+    # 1x1 convolution
+    x = layers.Conv2D(
+        32,
+        (1, 1),
+        padding="same",
+        use_bias=False,
+        kernel_regularizer=regularizers.l2(0.1)
+    )(x)
 
-        # Classification
-        layers.Flatten(),
+    x = layers.BatchNormalization()(x)
+    x = layers.PReLU()(x)
 
-        layers.Dense(
-            128,
-            activation="relu",
-            kernel_regularizer=regularizers.l2(0.0001)
-        ),
+    # Residual block 1
+    shortcut = x
 
-        layers.Dropout(0.5),
+    x = layers.Conv2D(
+        64,
+        (5, 5),
+        strides=2,
+        padding="same",
+        use_bias=False,
+        kernel_regularizer=regularizers.l2(0.1)
+    )(x)
 
-        layers.Dense(
-            NUM_CLASSES,
-            activation="softmax"
-        )
-    ])
+    x = layers.BatchNormalization()(x)
+    x = layers.PReLU()(x)
+
+    x = layers.Conv2D(
+        64,
+        (1, 1),
+        padding="same",
+        use_bias=False,
+        kernel_regularizer=regularizers.l2(0.1)
+    )(x)
+
+    x = layers.BatchNormalization()(x)
+
+    # Match shortcut dimensions
+    shortcut = layers.Conv2D(
+        64,
+        (1, 1),
+        strides=2,
+        padding="same",
+        use_bias=False
+    )(shortcut)
+
+    x = layers.Add()([x, shortcut])
+    x = layers.PReLU()(x)
+
+    # Residual block 2
+    shortcut = x
+
+    x = layers.Conv2D(
+        128,
+        (5, 5),
+        strides=2,
+        padding="same",
+        use_bias=False,
+        kernel_regularizer=regularizers.l2(0.1)
+    )(x)
+
+    x = layers.BatchNormalization()(x)
+    x = layers.PReLU()(x)
+
+    x = layers.Conv2D(
+        128,
+        (1, 1),
+        padding="same",
+        use_bias=False,
+        kernel_regularizer=regularizers.l2(0.1)
+    )(x)
+
+    x = layers.BatchNormalization()(x)
+
+    shortcut = layers.Conv2D(
+        128,
+        (1, 1),
+        strides=2,
+        padding="same",
+        use_bias=False
+    )(shortcut)
+
+    x = layers.Add()([x, shortcut])
+    x = layers.PReLU()(x)
+
+    # Final feature extraction
+    x = layers.Conv2D(
+        256,
+        (5, 5),
+        strides=2,
+        padding="same",
+        use_bias=False,
+        kernel_regularizer=regularizers.l2(0.1)
+    )(x)
+
+    x = layers.BatchNormalization()(x)
+    x = layers.PReLU()(x)
+
+    # Global feature representation
+    x = layers.GlobalAveragePooling2D()(x)
+
+    # Classification
+    outputs = layers.Dense(
+        NUM_CLASSES,
+        activation="softmax"
+    )(x)
+
+    model = models.Model(inputs, outputs)
+
+    optimizer = tf.keras.optimizers.RMSprop(
+        learning_rate=1e-4
+    )
 
     model.compile(
-        optimizer=Adam(learning_rate=0.0005),
+        optimizer=optimizer,
         loss="categorical_crossentropy",
         metrics=["accuracy"]
     )
